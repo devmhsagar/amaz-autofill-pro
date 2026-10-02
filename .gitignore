@@ -1,0 +1,10 @@
+# Operating System Files
+.DS_Store
+Thumbs.db
+*.swp
+*.tmp
+
+# Temporary files
+*.log
+scratch/
+.temp/
