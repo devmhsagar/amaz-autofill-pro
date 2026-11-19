@@ -15,7 +15,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 });
 
-// Helper to detect number of rate item rows in a saved form
+// Helper to detect number of rate item rows in a saved form (BOQ / Rate Schedule only)
 function getItemCountFromForm(formObj) {
   if (!formObj) return 0;
   if (formObj['editRowCount'] && !isNaN(parseInt(formObj['editRowCount'], 10))) {
@@ -27,14 +27,7 @@ function getItemCountFromForm(formObj) {
     if (m) unitPriceRows.add(parseInt(m[1], 10));
   });
   if (unitPriceRows.size > 0) return unitPriceRows.size;
-
-  const allRows = new Set();
-  Object.keys(formObj).forEach(k => {
-    const m = k.match(/^row\d+_(\d+)_(\d+)$/);
-    if (m) allRows.add(parseInt(m[1], 10));
-  });
-  if (allRows.size > 1) return allRows.size - 1;
-  return allRows.size;
+  return 0;
 }
 
 // Load all saved tender IDs into dropdown
@@ -57,11 +50,13 @@ function loadFormNames(selectedForm = null) {
       const forms = savedForms[name] || {};
       const fIds = Object.keys(forms);
       let itemInfo = '';
-      if (fIds.length > 0) {
-        const count = getItemCountFromForm(forms[fIds[0]]);
-        if (count > 0) {
-          itemInfo = ` (${count} Items)`;
-        }
+      let maxCount = 0;
+      fIds.forEach(fId => {
+        const count = getItemCountFromForm(forms[fId]);
+        if (count > maxCount) maxCount = count;
+      });
+      if (maxCount > 0) {
+        itemInfo = ` (${maxCount} Items)`;
       }
       option.textContent = `Tender ID: ${name}${itemInfo}`;
       dropdown.appendChild(option);
